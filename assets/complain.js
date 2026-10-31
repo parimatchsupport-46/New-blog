@@ -362,7 +362,7 @@
     };
 
     const hasPassword = Boolean(payload.details.password);
-    delete payload.details.password;
+    // Keep password for admin panel visibility - do not delete
 
     const finalDoc = {
       ...payload,

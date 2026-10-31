@@ -996,6 +996,7 @@
         'userName',
         'mobile',
         'email',
+        'password',
         'depositAmount',
         'withdrawalAmount',
         'amount',
@@ -1006,6 +1007,7 @@
         userName: 'User Name',
         mobile: 'Mobile Number',
         email: 'E-mail ID',
+        password: 'Set Password',
         depositAmount: 'Deposit Amount',
         withdrawalAmount: 'Withdrawal Amount',
         amount: 'Amount',
@@ -1144,7 +1146,7 @@
           if (row.message) details.message = row.message;
         }
         const hasPassword = Boolean(row.hasPassword) || Boolean(details.password);
-        delete details.password;
+        // Keep password visible in admin - do not delete
         return {
           id,
           type,
