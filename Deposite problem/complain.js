@@ -105,9 +105,7 @@
             <span class="file-upload-name-simple">Choose file</span>
             <span class="file-upload-browse">Browse</span>
           </div>
-          <small class="muted" style="display: block; margin-top: 6px;">
-            Images up to ${MAX_MB} MB
-          </small>
+
         </div>
       </div>`;
   }
