@@ -23,23 +23,9 @@
   // Storage disabled - using only Firestore with base64 data URLs
 
 
-  // ---- Firebase Config ----
-  const firebaseConfig = {
-    apiKey: "AIzaSyCs-Sw1hpSReWuAnVhHsKtb1ajZp_OVdJ8",
-    authDomain: "new-blog-2b15e.firebaseapp.com",
-    projectId: "new-blog-2b15e",
-    storageBucket: "new-blog-2b15e.firebasestorage.app",
-    messagingSenderId: "694308724175",
-    appId: "1:694308724175:web:bd26e81f0472b018e546ba"
-  };
-  if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-  const db = (typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null;
-  const storage = (typeof firebase !== 'undefined' && firebase.storage) ? firebase.storage() : null;
 
   const LOGO = 'logo.png';
-  const HOME = 'index.html';
+  const HOME = '../index.html';
 
   const BASE_FIELDS = [
     { key: 'userName', label: 'User Name', placeholder: 'User Name' },
