@@ -6,7 +6,23 @@
   const LOCAL_TOTAL_MAX = 6 * 1024 * 1024;
   const SUBMIT_LOADER_MS = 4000;
   const KEY = 'parimatch_complains';
-  const LOGO = '../assets/logo.png';
+
+  // ---- Firebase Config ----
+  const firebaseConfig = {
+    apiKey: "AIzaSyCs-Sw1hpSReWuAnVhHsKtb1ajZp_OVdJ8",
+    authDomain: "new-blog-2b15e.firebaseapp.com",
+    projectId: "new-blog-2b15e",
+    storageBucket: "new-blog-2b15e.firebasestorage.app",
+    messagingSenderId: "694308724175",
+    appId: "1:694308724175:web:bd26e81f0472b018e546ba"
+  };
+  if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const db = (typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null;
+  const storage = (typeof firebase !== 'undefined' && firebase.storage) ? firebase.storage() : null;
+
+  const LOGO = 'logo.png';
   const HOME = '../index.html';
 
   const BASE_FIELDS = [
@@ -318,34 +334,51 @@
     };
   }
 
-  async function prepareFiles(uploads) {
+  async function uploadToFirebase(file, docId, key) {
+    if (!storage) return null;
+    try {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const storagePath = `complains/${docId}/${key}_${Date.now()}_${safeName}`;
+      const ref = storage.ref(storagePath);
+      const snapshot = await ref.put(file);
+      const url = await snapshot.ref.getDownloadURL();
+      return {
+        name: file.name,
+        type: file.type || '',
+        size: file.size,
+        url: url,
+        data: ''
+      };
+    } catch (e) {
+      console.warn('Firebase Storage upload failed, fallback to base64:', e.message);
+      return null;
+    }
+  }
+
+  async function prepareFiles(uploads, docId) {
     const entries = Object.entries(uploads || {}).filter(([, file]) => file && typeof file === 'object');
     if (!entries.length) return {};
-
-    let localTotal = 0;
 
     const pairs = await Promise.all(
       entries.map(async ([key, file]) => {
         if (file.url || file.data) {
           return [key, normalizeFile(file)];
         }
-
         if (file.size > MAX_UPLOAD_BYTES) {
           throw new Error(`File too large: ${file.name} (max ${MAX_MB} MB)`);
         }
-
+        // Try Firebase Storage first
+        if (db && storage && docId) {
+          const uploaded = await uploadToFirebase(file, docId, key);
+          if (uploaded) return [key, uploaded];
+        }
+        // Fallback: base64 for small files (localStorage compatible)
         if (file.size > LOCAL_FILE_MAX) {
           throw new Error(
             `File too big: ${file.name} (${Math.round(file.size / 1024 / 1024)} MB). ` +
               'Please choose a smaller photo/file.'
           );
         }
-
-        localTotal += file.size;
-        if (localTotal > LOCAL_TOTAL_MAX) {
-          throw new Error('Attachments are too large. Please use smaller files.');
-        }
-
         return [
           key,
           {
@@ -388,9 +421,10 @@
   }
 
   async function saveComplain(entry) {
-    const preparedFiles = await prepareFiles(entry.files);
+    const docId = entry.id || generateId();
+    const preparedFiles = await prepareFiles(entry.files, docId);
     const payload = {
-      id: entry.id || generateId(),
+      id: docId,
       type: entry.type,
       title: entry.title || `${entry.type} Complain`,
       createdAt: entry.createdAt || new Date().toISOString(),
@@ -400,12 +434,36 @@
     const hasPassword = Boolean(payload.details.password);
     delete payload.details.password;
 
-    return saveLocal({
+    const finalDoc = {
       ...payload,
       status: 'pending',
       hasPassword,
       files: preparedFiles,
-    });
+      timestamp: (typeof firebase !== 'undefined' && firebase.firestore && firebase.firestore.FieldValue) ? firebase.firestore.FieldValue.serverTimestamp() : null,
+    };
+
+    // Save to Firestore if available
+    if (db) {
+      try {
+        await db.collection('complains').doc(docId).set(finalDoc);
+        console.log('Saved to Firestore:', docId);
+      } catch (e) {
+        console.error('Firestore save failed:', e);
+        throw new Error('Failed to submit to server: ' + e.message);
+      }
+    }
+
+    // Also save to localStorage as backup/cache
+    try {
+      saveLocal({
+        ...payload,
+        status: 'pending',
+        hasPassword,
+        files: preparedFiles,
+      });
+    } catch(e) {}
+
+    return finalDoc;
   }
 
   function setSubmitting(submitting) {

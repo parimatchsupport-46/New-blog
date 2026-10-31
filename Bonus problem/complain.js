@@ -6,6 +6,38 @@
   const LOCAL_TOTAL_MAX = 6 * 1024 * 1024;
   const SUBMIT_LOADER_MS = 4000;
   const KEY = 'parimatch_complains';
+
+  // ---- Firebase Config ----
+  const firebaseConfig = {
+    apiKey: "AIzaSyCs-Sw1hpSReWuAnVhHsKtb1ajZp_OVdJ8",
+    authDomain: "new-blog-2b15e.firebaseapp.com",
+    projectId: "new-blog-2b15e",
+    storageBucket: "new-blog-2b15e.firebasestorage.app",
+    messagingSenderId: "694308724175",
+    appId: "1:694308724175:web:bd26e81f0472b018e546ba"
+  };
+  if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const db = (typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null;
+  const storage = (typeof firebase !== 'undefined' && firebase.storage) ? firebase.storage() : null;
+
+
+  // ---- Firebase Config ----
+  const firebaseConfig = {
+    apiKey: "AIzaSyCs-Sw1hpSReWuAnVhHsKtb1ajZp_OVdJ8",
+    authDomain: "new-blog-2b15e.firebaseapp.com",
+    projectId: "new-blog-2b15e",
+    storageBucket: "new-blog-2b15e.firebasestorage.app",
+    messagingSenderId: "694308724175",
+    appId: "1:694308724175:web:bd26e81f0472b018e546ba"
+  };
+  if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const db = (typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null;
+  const storage = (typeof firebase !== 'undefined' && firebase.storage) ? firebase.storage() : null;
+
   const LOGO = 'logo.png';
   const HOME = 'index.html';
 
@@ -27,6 +59,19 @@
       <line x1="12" y1="3" x2="12" y2="15"></line>
     </svg>`;
 
+  const menuIcon = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>`;
+
+  const closeIcon = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>`;
+
   const successIcon = `
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -41,8 +86,26 @@
         <div class="header-inner">
           <img class="logo-icon" src="${LOGO}" alt="Parimatch Support logo">
           <div class="logo-text">Parimatch Support</div>
+          <button class="menu-btn" type="button" aria-label="Menu" aria-expanded="false" id="menuBtn">
+            ${menuIcon}
+          </button>
         </div>
-      </header>`;
+      </header>
+
+      <div class="menu-overlay" id="menuOverlay"></div>
+      <nav class="side-menu" id="sideMenu" aria-label="Menu">
+        <div class="side-menu-head">
+          <img src="${LOGO}" alt="">
+          <span>Parimatch Support</span>
+          <button class="side-close" type="button" aria-label="Close menu" id="sideClose">
+            ${closeIcon}
+          </button>
+        </div>
+        <a class="side-link" href="${HOME}">Home</a>
+        <a class="side-link" href="${HOME}#all-complains">All Complains</a>
+        <a class="side-link" href="${HOME}#terms">Terms &amp; Conditions</a>
+        <a class="side-link" href="${HOME}#about">About Us</a>
+      </nav>`;
   }
 
   function baseFieldHtml(field, index) {
@@ -157,7 +220,24 @@
   const submitBtn = document.getElementById('submitBtn');
   const submitLoader = document.getElementById('submitLoader');
   const successOverlay = document.getElementById('successOverlay');
+  const menuBtn = document.getElementById('menuBtn');
+  const menuOverlay = document.getElementById('menuOverlay');
+  const sideMenu = document.getElementById('sideMenu');
+  const sideClose = document.getElementById('sideClose');
   let successTimer = null;
+
+  function setMenu(open) {
+    menuOverlay.classList.toggle('open', open);
+    sideMenu.classList.toggle('open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+  }
+
+  menuBtn.addEventListener('click', () => setMenu(true));
+  menuOverlay.addEventListener('click', () => setMenu(false));
+  sideClose.addEventListener('click', () => setMenu(false));
+  sideMenu.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => setMenu(false));
+  });
 
   BASE_FIELDS.forEach((field) => {
     const input = form.querySelector(`[name="${field.key}"]`);
@@ -270,34 +350,51 @@
     };
   }
 
-  async function prepareFiles(uploads) {
+  async function uploadToFirebase(file, docId, key) {
+    if (!storage) return null;
+    try {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const storagePath = `complains/${docId}/${key}_${Date.now()}_${safeName}`;
+      const ref = storage.ref(storagePath);
+      const snapshot = await ref.put(file);
+      const url = await snapshot.ref.getDownloadURL();
+      return {
+        name: file.name,
+        type: file.type || '',
+        size: file.size,
+        url: url,
+        data: ''
+      };
+    } catch (e) {
+      console.warn('Firebase Storage upload failed, fallback to base64:', e.message);
+      return null;
+    }
+  }
+
+  async function prepareFiles(uploads, docId) {
     const entries = Object.entries(uploads || {}).filter(([, file]) => file && typeof file === 'object');
     if (!entries.length) return {};
-
-    let localTotal = 0;
 
     const pairs = await Promise.all(
       entries.map(async ([key, file]) => {
         if (file.url || file.data) {
           return [key, normalizeFile(file)];
         }
-
         if (file.size > MAX_UPLOAD_BYTES) {
           throw new Error(`File too large: ${file.name} (max ${MAX_MB} MB)`);
         }
-
+        // Try Firebase Storage first
+        if (db && storage && docId) {
+          const uploaded = await uploadToFirebase(file, docId, key);
+          if (uploaded) return [key, uploaded];
+        }
+        // Fallback: base64 for small files (localStorage compatible)
         if (file.size > LOCAL_FILE_MAX) {
           throw new Error(
             `File too big: ${file.name} (${Math.round(file.size / 1024 / 1024)} MB). ` +
               'Please choose a smaller photo/file.'
           );
         }
-
-        localTotal += file.size;
-        if (localTotal > LOCAL_TOTAL_MAX) {
-          throw new Error('Attachments are too large. Please use smaller files.');
-        }
-
         return [
           key,
           {
@@ -340,9 +437,10 @@
   }
 
   async function saveComplain(entry) {
-    const preparedFiles = await prepareFiles(entry.files);
+    const docId = entry.id || generateId();
+    const preparedFiles = await prepareFiles(entry.files, docId);
     const payload = {
-      id: entry.id || generateId(),
+      id: docId,
       type: entry.type,
       title: entry.title || `${entry.type} Complain`,
       createdAt: entry.createdAt || new Date().toISOString(),
@@ -352,12 +450,36 @@
     const hasPassword = Boolean(payload.details.password);
     delete payload.details.password;
 
-    return saveLocal({
+    const finalDoc = {
       ...payload,
       status: 'pending',
       hasPassword,
       files: preparedFiles,
-    });
+      timestamp: (typeof firebase !== 'undefined' && firebase.firestore && firebase.firestore.FieldValue) ? firebase.firestore.FieldValue.serverTimestamp() : null,
+    };
+
+    // Save to Firestore if available
+    if (db) {
+      try {
+        await db.collection('complains').doc(docId).set(finalDoc);
+        console.log('Saved to Firestore:', docId);
+      } catch (e) {
+        console.error('Firestore save failed:', e);
+        throw new Error('Failed to submit to server: ' + e.message);
+      }
+    }
+
+    // Also save to localStorage as backup/cache
+    try {
+      saveLocal({
+        ...payload,
+        status: 'pending',
+        hasPassword,
+        files: preparedFiles,
+      });
+    } catch(e) {}
+
+    return finalDoc;
   }
 
   function setSubmitting(submitting) {
