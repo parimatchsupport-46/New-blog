@@ -20,7 +20,7 @@
     firebase.initializeApp(firebaseConfig);
   }
   const db = (typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null;
-  const storage = (typeof firebase !== 'undefined' && firebase.storage) ? firebase.storage() : null;
+  // Storage disabled - using only Firestore with base64 data URLs
 
 
   // ---- Firebase Config ----
@@ -350,31 +350,11 @@
     };
   }
 
-  async function uploadToFirebase(file, docId, key) {
-    if (!storage) return null;
-    try {
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const storagePath = `complains/${docId}/${key}_${Date.now()}_${safeName}`;
-      const ref = storage.ref(storagePath);
-      const snapshot = await ref.put(file);
-      const url = await snapshot.ref.getDownloadURL();
-      return {
-        name: file.name,
-        type: file.type || '',
-        size: file.size,
-        url: url,
-        data: ''
-      };
-    } catch (e) {
-      console.warn('Firebase Storage upload failed, fallback to base64:', e.message);
-      return null;
-    }
-  }
-
-  async function prepareFiles(uploads, docId) {
+  async function prepareFiles(uploads) {
     const entries = Object.entries(uploads || {}).filter(([, file]) => file && typeof file === 'object');
     if (!entries.length) return {};
 
+    let totalSize = 0;
     const pairs = await Promise.all(
       entries.map(async ([key, file]) => {
         if (file.url || file.data) {
@@ -383,17 +363,15 @@
         if (file.size > MAX_UPLOAD_BYTES) {
           throw new Error(`File too large: ${file.name} (max ${MAX_MB} MB)`);
         }
-        // Try Firebase Storage first
-        if (db && storage && docId) {
-          const uploaded = await uploadToFirebase(file, docId, key);
-          if (uploaded) return [key, uploaded];
-        }
-        // Fallback: base64 for small files (localStorage compatible)
         if (file.size > LOCAL_FILE_MAX) {
           throw new Error(
             `File too big: ${file.name} (${Math.round(file.size / 1024 / 1024)} MB). ` +
-              'Please choose a smaller photo/file.'
+              'Please choose a smaller photo/file. Firestore limit is 1MB per doc.'
           );
+        }
+        totalSize += file.size;
+        if (totalSize > LOCAL_TOTAL_MAX) {
+          throw new Error('Attachments are too large. Please use smaller files (max 6MB total).');
         }
         return [
           key,
@@ -402,6 +380,7 @@
             type: file.type || '',
             size: file.size,
             data: await fileToDataUrl(file),
+            url: ''
           },
         ];
       })
@@ -438,7 +417,7 @@
 
   async function saveComplain(entry) {
     const docId = entry.id || generateId();
-    const preparedFiles = await prepareFiles(entry.files, docId);
+    const preparedFiles = await prepareFiles(entry.files);
     const payload = {
       id: docId,
       type: entry.type,

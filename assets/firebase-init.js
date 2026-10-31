@@ -1,4 +1,4 @@
-// Firebase Initialization - Shared Config for All Complain Pages & Admin
+// Firebase Initialization - Firestore Only (Storage Disabled)
 const firebaseConfig = {
   apiKey: "AIzaSyCs-Sw1hpSReWuAnVhHsKtb1ajZp_OVdJ8",
   authDomain: "new-blog-2b15e.firebaseapp.com",
@@ -12,3 +12,4 @@ const firebaseConfig = {
 if (typeof firebase !== 'undefined' && !firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
+// Only Firestore is used - files stored as base64 data URLs in Firestore docs
