@@ -27,19 +27,6 @@
       <line x1="12" y1="3" x2="12" y2="15"></line>
     </svg>`;
 
-  const menuIcon = `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-      <line x1="3" y1="6" x2="21" y2="6"></line>
-      <line x1="3" y1="12" x2="21" y2="12"></line>
-      <line x1="3" y1="18" x2="21" y2="18"></line>
-    </svg>`;
-
-  const closeIcon = `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-      <line x1="18" y1="6" x2="6" y2="18"></line>
-      <line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg>`;
-
   const successIcon = `
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -54,26 +41,8 @@
         <div class="header-inner">
           <img class="logo-icon" src="${LOGO}" alt="Parimatch Support logo">
           <div class="logo-text">Parimatch Support</div>
-          <button class="menu-btn" type="button" aria-label="Menu" aria-expanded="false" id="menuBtn">
-            ${menuIcon}
-          </button>
         </div>
-      </header>
-
-      <div class="menu-overlay" id="menuOverlay"></div>
-      <nav class="side-menu" id="sideMenu" aria-label="Menu">
-        <div class="side-menu-head">
-          <img src="${LOGO}" alt="">
-          <span>Parimatch Support</span>
-          <button class="side-close" type="button" aria-label="Close menu" id="sideClose">
-            ${closeIcon}
-          </button>
-        </div>
-        <a class="side-link" href="${HOME}">Home</a>
-        <a class="side-link" href="${HOME}#all-complains">All Complains</a>
-        <a class="side-link" href="${HOME}#terms">Terms &amp; Conditions</a>
-        <a class="side-link" href="${HOME}#about">About Us</a>
-      </nav>`;
+      </header>`;
   }
 
   function baseFieldHtml(field, index) {
@@ -188,24 +157,7 @@
   const submitBtn = document.getElementById('submitBtn');
   const submitLoader = document.getElementById('submitLoader');
   const successOverlay = document.getElementById('successOverlay');
-  const menuBtn = document.getElementById('menuBtn');
-  const menuOverlay = document.getElementById('menuOverlay');
-  const sideMenu = document.getElementById('sideMenu');
-  const sideClose = document.getElementById('sideClose');
   let successTimer = null;
-
-  function setMenu(open) {
-    menuOverlay.classList.toggle('open', open);
-    sideMenu.classList.toggle('open', open);
-    menuBtn.setAttribute('aria-expanded', String(open));
-  }
-
-  menuBtn.addEventListener('click', () => setMenu(true));
-  menuOverlay.addEventListener('click', () => setMenu(false));
-  sideClose.addEventListener('click', () => setMenu(false));
-  sideMenu.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => setMenu(false));
-  });
 
   BASE_FIELDS.forEach((field) => {
     const input = form.querySelector(`[name="${field.key}"]`);
