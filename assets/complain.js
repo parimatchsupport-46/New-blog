@@ -87,13 +87,12 @@
   }
 
   function fileFieldHtml(file, animClass) {
-    const required = file.required !== false;
     return `
       <div class="${animClass}">
         <div class="form-group">
           <label>
             ${file.label}
-            ${required ? '<span aria-hidden="true"> *</span>' : ''}
+
           </label>
           <div class="file-upload-simple" data-key="${file.key}">
             <input type="file" accept="${file.accept || 'image/*'}" hidden aria-hidden="true" tabindex="-1">
