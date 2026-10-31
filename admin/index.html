@@ -879,6 +879,50 @@
       .result-pill { width: 100%; text-align: right; padding: 0; }
       .viewer-actions .btn { flex: 1; }
     }
+  
+    .detail.has-copy {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .detail-main { flex: 1; min-width: 0; }
+    .copy-btn {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-2);
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .copy-btn:hover { background: var(--surface-3); color: var(--text); border-color: #3a4050; }
+    .copy-btn.copied { background: rgba(53,201,139,0.15); border-color: rgba(53,201,139,0.3); color: var(--green); }
+    .copy-btn svg { width: 14px; height: 14px; }
+    .copy-toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: #1e2128;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
   </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1167,6 +1211,26 @@
         ];
       }
 
+      const COPY_KEYS = ['mobile', 'email', 'password'];
+      function copyIconSvg() {
+        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>`;
+      }
+      function tickIconSvg() {
+        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 10-10"></path></svg>`;
+      }
+      function showToast(msg) {
+        let toast = document.getElementById('copyToast');
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.id = 'copyToast';
+          toast.className = 'copy-toast';
+          document.body.appendChild(toast);
+        }
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => toast.classList.remove('show'), 1800);
+      }
       function detailsHtml(details) {
         const keys = detailKeys(details);
         if (!keys.length) {
@@ -1179,6 +1243,19 @@
         return keys.map((key) => {
           const value = details[key];
           const shown = value === undefined || value === null || String(value).trim() === '' ? '—' : value;
+          const canCopy = COPY_KEYS.includes(key) && shown !== '—';
+          if (canCopy) {
+            return `
+              <div class="detail has-copy">
+                <div class="detail-main">
+                  <span class="detail-label">${escapeHtml(labelFor(key))}</span>
+                  <span class="detail-value">${escapeHtml(shown)}</span>
+                </div>
+                <button class="copy-btn" type="button" data-copy="${escapeHtml(String(value))}" aria-label="Copy ${escapeHtml(labelFor(key))}" title="Copy">
+                  ${copyIconSvg()}
+                </button>
+              </div>`;
+          }
           return `
             <div class="detail">
               <span class="detail-label">${escapeHtml(labelFor(key))}</span>
@@ -1396,6 +1473,31 @@
         const key = button.getAttribute('data-key');
         const row = allRows.find((item) => item.id === id);
         if (row) openViewer(row, key);
+      });
+
+      list.addEventListener('click', async (event) => {
+        const btn = event.target.closest('.copy-btn');
+        if (!btn) return;
+        const text = btn.getAttribute('data-copy') || '';
+        if (!text) return;
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        const orig = btn.innerHTML;
+        btn.classList.add('copied');
+        btn.innerHTML = tickIconSvg();
+        showToast('Copied: ' + text.slice(0, 30) + (text.length > 30 ? '…' : ''));
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = orig;
+        }, 1200);
       });
 
       todayBtn.addEventListener('click', () => setFilter('today'));
