@@ -908,11 +908,6 @@
       <div class="result-pill"><strong id="resultCount">0</strong> complaints</div>
     </section>
 
-    <div class="demo-notice" id="firebaseStatus" style="border-color: rgba(53,201,139,0.3); background: rgba(53,201,139,0.07);">
-      <span class="demo-dot" style="background: #35c98b; box-shadow: 0 0 0 4px rgba(53,201,139,0.12);"></span>
-      <span><strong>Firebase Live</strong> — <span id="firebaseStatusText">Connecting to Firestore...</span></span>
-    </div>
-
     <section class="list" id="list" aria-live="polite"></section>
   </main>
 
@@ -1027,9 +1022,6 @@
       const resultCount = document.getElementById('resultCount');
       const todayBtn = document.getElementById('todayBtn');
       const allBtn = document.getElementById('allBtn');
-      const firebaseStatus = document.getElementById('firebaseStatus');
-      const firebaseStatusText = document.getElementById('firebaseStatusText');
-
       const viewer = document.getElementById('viewer');
       const viewerTitle = document.getElementById('viewerTitle');
       const viewerMeta = document.getElementById('viewerMeta');
@@ -1322,7 +1314,6 @@
       }
 
       function startFirestoreListener() {
-        if (firebaseStatusText) firebaseStatusText.textContent = 'Connecting to Firestore...';
         if (unsubscribe) unsubscribe();
         list.innerHTML = `
           <div class="empty" style="min-height:200px;">
@@ -1333,23 +1324,11 @@
         unsubscribe = db.collection('complains').orderBy('createdAt', 'desc').onSnapshot(
           (snapshot) => {
             allRows = snapshot.docs.map(doc => normalizeRow(doc.data())).filter(Boolean);
-            if (firebaseStatusText) {
-              firebaseStatusText.textContent = `Live — ${allRows.length} complaints synced • Project: new-blog-2b15e`;
-            }
-            if (firebaseStatus) {
-              firebaseStatus.style.borderColor = 'rgba(53,201,139,0.25)';
-              firebaseStatus.style.background = 'rgba(53,201,139,0.08)';
-            }
             render();
             console.log('[Firebase] Synced', allRows.length, 'complains');
           },
           (error) => {
             console.error('[Firebase] Error:', error);
-            if (firebaseStatusText) firebaseStatusText.textContent = 'Error: ' + error.message;
-            if (firebaseStatus) {
-              firebaseStatus.style.borderColor = 'rgba(255,107,111,0.3)';
-              firebaseStatus.style.background = 'rgba(255,107,111,0.08)';
-            }
             list.innerHTML = `
               <div class="empty">
                 <div class="empty-icon" style="color:var(--red); border-color: rgba(255,107,111,0.3);">⚠️</div>
