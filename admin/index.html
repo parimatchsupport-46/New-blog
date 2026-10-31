@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — Parimatch Support</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23F5FF00'/%3E%3Cpath d='M7 12l3 3 7-7' fill='none' stroke='%231c1f28' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0b0f;
+      --surface: #16181e;
+      --surface-2: #1e2128;
+      --surface-3: #252a36;
+      --border: #2a2e3a;
+      --border-soft: #232733;
+      --text: #eceef3;
+      --muted: #9aa1b2;
+      --accent: #F5FF00;
+      --accent-dark: #1c1f28;
+      --green: #35c98b;
+      --green-soft: rgba(53, 201, 139, 0.14);
+      --red: #ff6b6f;
+      --red-soft: rgba(255, 107, 111, 0.14);
+      --blue: #7b92ff;
+      --blue-soft: rgba(123, 146, 255, 0.14);
+      --warn: #f0b543;
+      --warn-soft: rgba(240, 181, 67, 0.14);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { color-scheme: dark; }
+    [hidden] { display: none !important; }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(900px 520px at 100% -10%, rgba(245, 255, 0, 0.08), transparent 60%),
+        radial-gradient(720px 420px at -10% 8%, rgba(123, 146, 255, 0.08), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    button, a { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(22, 24, 30, 0.82);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .topbar-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      background: var(--accent);
+      color: var(--accent-dark);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      box-shadow: 0 8px 24px rgba(245, 255, 0, 0.16);
+    }
+
+    .logo-mark svg { width: 24px; height: 24px; }
+
+    .brand-title {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-sub {
+      margin-top: 2px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .live-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(53, 201, 139, 0.13);
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 8px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.7rem, 4vw, 2.4rem);
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero p {
+      margin-top: 8px;
+      max-width: 560px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .stats {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .stat-card {
+      min-width: 96px;
+      padding: 11px 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(37, 42, 54, 0.7), rgba(22, 24, 30, 0.9));
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: 1.35rem;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-card span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(22, 24, 30, 0.72);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      height: 40px;
+      padding: 0 18px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 700;
+      transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.18s;
+    }
+
+    .tab:hover {
+      color: var(--text);
+      border-color: #3a4050;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-dark);
+      box-shadow: 0 8px 22px rgba(245, 255, 0, 0.16);
+    }
+
+    .result-pill {
+      padding: 0 6px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .result-pill strong { color: var(--text); }
+
+    .demo-notice {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 14px;
+      padding: 10px 13px;
+      border: 1px dashed rgba(245, 255, 0, 0.34);
+      border-radius: 10px;
+      background: rgba(245, 255, 0, 0.055);
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.4;
+    }
+
+    .demo-notice strong { color: var(--accent); }
+
+    .demo-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      box-shadow: 0 0 0 4px rgba(245, 255, 0, 0.1);
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .complaint {
+      position: relative;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(30, 33, 40, 0.72), rgba(22, 24, 30, 0.92));
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+      overflow: hidden;
+    }
+
+    .complaint::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--accent), rgba(245, 255, 0, 0.08));
+      opacity: 0.8;
+    }
+
+    .complaint-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .complaint-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .type-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid rgba(245, 255, 0, 0.22);
+      background: rgba(245, 255, 0, 0.1);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 1.05rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .complaint-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+
+    .complaint-meta {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      word-break: break-word;
+    }
+
+    .meta-sep { opacity: 0.45; padding: 0 4px; }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .status.pending { background: var(--warn-soft); color: var(--warn); }
+    .status.success { background: var(--green-soft); color: var(--green); }
+    .status.danger { background: var(--red-soft); color: var(--red); }
+    .status.info { background: var(--blue-soft); color: var(--blue); }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .detail {
+      min-width: 0;
+      padding: 9px 11px;
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      background: rgba(10, 11, 15, 0.44);
+    }
+
+    .detail-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .detail-value {
+      display: block;
+      margin-top: 3px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .attachments {
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+
+    .attachments h3 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .attachment-count {
+      display: inline-grid;
+      place-items: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: var(--surface-3);
+      color: var(--text);
+      font-size: 0.66rem;
+      letter-spacing: 0;
+    }
+
+    .file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .file-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      background: rgba(30, 33, 40, 0.62);
+    }
+
+    .file-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: var(--surface-2);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .file-icon svg { width: 17px; height: 17px; }
+
+    .file-meta {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .file-meta strong {
+      font-size: 0.8rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-meta span {
+      color: var(--muted);
+      font-size: 0.71rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      height: 38px;
+      padding: 0 15px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.18s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn:active { transform: translateY(1px); }
+
+    .btn.primary {
+      background: var(--accent);
+      color: var(--accent-dark);
+    }
+
+    .btn.primary:hover { background: #E8F100; }
+
+    .btn.ghost {
+      background: var(--surface-2);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .btn.ghost:hover { background: var(--surface-3); }
+
+    .btn.view-btn {
+      height: 32px;
+      padding: 0 12px;
+      border-color: rgba(245, 255, 0, 0.3);
+      background: rgba(245, 255, 0, 0.08);
+      color: var(--accent);
+      font-size: 0.74rem;
+    }
+
+    .btn.view-btn:hover {
+      background: rgba(245, 255, 0, 0.16);
+      border-color: rgba(245, 255, 0, 0.55);
+    }
+
+    .btn.disabled {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .no-files {
+      padding: 11px 12px;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .complaint-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .password-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    .password-tag::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    .password-tag.on::before { background: var(--green); }
+
+    .empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+      min-height: 300px;
+      padding: 40px 24px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      background: rgba(22, 24, 30, 0.55);
+    }
+
+    .empty-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      margin-bottom: 6px;
+    }
+
+    .empty-icon svg { width: 26px; height: 26px; }
+    .empty h2 { font-size: 1.05rem; font-weight: 800; }
+    .empty p { max-width: 360px; color: var(--muted); font-size: 0.85rem; }
+
+    .viewer-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(4, 5, 8, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .viewer-overlay.open { opacity: 1; }
+
+    .viewer-modal {
+      width: min(760px, 100%);
+      max-height: calc(100vh - 36px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
+      transform: translateY(8px) scale(0.98);
+      transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.05);
+    }
+
+    .viewer-overlay.open .viewer-modal { transform: translateY(0) scale(1); }
+
+    .viewer-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .viewer-head h3 {
+      font-size: 0.98rem;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .viewer-head p {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      word-break: break-word;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface-2);
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .icon-btn:hover { background: var(--surface-3); color: var(--text); }
+    .icon-btn svg { width: 16px; height: 16px; }
+
+    .viewer-body {
+      flex: 1;
+      min-height: 180px;
+      max-height: 64vh;
+      display: grid;
+      place-items: center;
+      padding: 10px;
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      background: #0d0f14;
+      overflow: auto;
+    }
+
+    .viewer-body img {
+      display: block;
+      max-width: 100%;
+      max-height: 60vh;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .viewer-fallback {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 30px 20px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    .viewer-fallback svg {
+      width: 42px;
+      height: 42px;
+      color: var(--accent);
+      opacity: 0.8;
+    }
+
+    .viewer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .viewer-open { overflow: hidden; }
+
+    @media (max-width: 720px) {
+      .container { padding: 22px 14px 48px; }
+      .topbar-inner { padding: 12px 14px; }
+      .hero { align-items: flex-start; flex-direction: column; gap: 16px; }
+      .stats { width: 100%; }
+      .stat-card { flex: 1; min-width: 0; }
+      .complaint { padding: 16px; }
+      .complaint-top { flex-direction: column; }
+      .status { align-self: flex-start; }
+      .detail-grid { grid-template-columns: 1fr 1fr; }
+      .file-row { align-items: flex-start; }
+      .btn.view-btn { height: 30px; padding: 0 10px; }
+    }
+
+    @media (max-width: 480px) {
+      .detail-grid { grid-template-columns: 1fr; }
+      .toolbar { align-items: stretch; }
+      .tabs { width: 100%; }
+      .tab { flex: 1; padding: 0 10px; font-size: 0.78rem; }
+      .result-pill { width: 100%; text-align: right; padding: 0; }
+      .viewer-actions .btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <div class="stats">
+        <div class="stat-card">
+          <strong id="totalCount">0</strong>
+          <span>Total</span>
+        </div>
+        <div class="stat-card">
+          <strong id="todayCount">0</strong>
+          <span>Today</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="toolbar">
+      <div class="tabs" role="group" aria-label="Complaint filter">
+        <button class="tab" type="button" id="todayBtn" aria-pressed="false">Today Complaints</button>
+        <button class="tab active" type="button" id="allBtn" aria-pressed="true">All Complaints</button>
+      </div>
+      <div class="result-pill"><strong id="resultCount">0</strong> complaints</div>
+    </section>
+
+    <div class="demo-notice" id="demoNotice" hidden>
+      <span class="demo-dot"></span>
+      <span><strong>Demo data</strong> — real complaints will appear here automatically.</span>
+    </div>
+
+    <section class="list" id="list" aria-live="polite"></section>
+  </main>
+
+  <div class="viewer-overlay" id="viewer" hidden>
+    <div class="viewer-modal" role="dialog" aria-modal="true" aria-labelledby="viewerTitle">
+      <div class="viewer-head">
+        <div>
+          <h3 id="viewerTitle">Attachment</h3>
+          <p id="viewerMeta"></p>
+        </div>
+        <button class="icon-btn" id="viewerClose" type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="viewer-body">
+        <img id="viewerImg" alt="" />
+        <div class="viewer-fallback" id="viewerFallback" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span>Preview is not available for this file.</span>
+        </div>
+      </div>
+
+      <div class="viewer-actions">
+        <a class="btn primary" id="downloadBtn" download>Download</a>
+        <button class="btn ghost" id="closeBtn" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const KEY = 'parimatch_complains';
+      const BASE_FIELDS = ['userName', 'mobile', 'email'];
+      const PREFERRED_KEYS = [
+        'userName',
+        'mobile',
+        'email',
+        'depositAmount',
+        'withdrawalAmount',
+        'amount',
+        'message',
+      ];
+
+      const LABELS = {
+        userName: 'User Name',
+        mobile: 'Mobile Number',
+        email: 'E-mail ID',
+        depositAmount: 'Deposit Amount',
+        withdrawalAmount: 'Withdrawal Amount',
+        amount: 'Amount',
+        message: 'Message',
+        paymentImage: 'Payment Image',
+        issueImage: 'Issue Image',
+        aadharFront: 'Aadhar Front',
+        aadharBack: 'Aadhar Back',
+      };
+
+      function demoImage(title, subtitle, footer, accent) {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560">
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop stop-color="#16181e"></stop>
+              <stop offset="1" stop-color="#0a0b0f"></stop>
+            </linearGradient>
+          </defs>
+          <rect width="900" height="560" fill="url(#g)"></rect>
+          <rect x="40" y="40" width="820" height="480" rx="24" fill="#1e2128" stroke="#2a2e3a"></rect>
+          <circle cx="90" cy="95" r="18" fill="${accent}"></circle>
+          <text x="125" y="102" fill="#eceef3" font-size="22" font-family="Arial, sans-serif" font-weight="700">${title}</text>
+          <text x="70" y="170" fill="#9aa1b2" font-size="18" font-family="Arial, sans-serif">${subtitle}</text>
+          <rect x="70" y="205" width="760" height="1" fill="#2a2e3a"></rect>
+          <text x="70" y="270" fill="#eceef3" font-size="32" font-family="Arial, sans-serif" font-weight="700">${footer}</text>
+          <text x="70" y="318" fill="#9aa1b2" font-size="17" font-family="Arial, sans-serif">Demo attachment preview</text>
+          <rect x="70" y="390" width="240" height="52" rx="10" fill="${accent}"></rect>
+          <text x="100" y="423" fill="#1c1f28" font-size="18" font-family="Arial, sans-serif" font-weight="700">VERIFIED</text>
+        </svg>`;
+        return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+      }
+
+      function demoFile(name, data, size) {
+        return { name, type: 'image/svg+xml', size, data };
+      }
+
+      function buildDemoRows() {
+        const now = Date.now();
+        const payment = demoImage('PAYMENT RECEIPT', 'Deposit request • UTR 4587 2210 9901', 'Rs. 5,000.00', '#F5FF00');
+        const withdrawal = demoImage('WITHDRAWAL FAILED', 'Issue screenshot • transaction declined', 'Rs. 12,500.00', '#ff6b6f');
+        const aadhar = demoImage('GOVERNMENT ID', 'Aadhaar card • front side', 'XXXX XXXX 4218', '#7b92ff');
+        const aadharBack = demoImage('GOVERNMENT ID', 'Aadhaar card • back side', 'Address verified', '#7b92ff');
+
+        return [
+          {
+            id: 'DEMO-1001',
+            type: 'Deposit',
+            title: 'Deposit Complain',
+            createdAt: new Date(now - 20 * 60 * 1000).toISOString(),
+            status: 'pending',
+            hasPassword: true,
+            details: {
+              userName: 'Rahul Sharma',
+              mobile: '98765 43210',
+              email: 'rahul.sharma@example.com',
+              depositAmount: '5,000',
+            },
+            files: { paymentImage: demoFile('payment-receipt.svg', payment, 184320) },
+          },
+          {
+            id: 'DEMO-1002',
+            type: 'Withdrawal',
+            title: 'Withdrawal Complain',
+            createdAt: new Date(now - 90 * 60 * 1000).toISOString(),
+            status: 'pending',
+            hasPassword: false,
+            details: {
+              userName: 'Ayesha Khan',
+              mobile: '91234 56780',
+              email: 'ayesha.khan@example.com',
+              withdrawalAmount: '12,500',
+            },
+            files: { issueImage: demoFile('withdrawal-error.svg', withdrawal, 226304) },
+          },
+          {
+            id: 'DEMO-1003',
+            type: 'Bonus',
+            title: 'Bonus Complain',
+            createdAt: new Date(now - 26 * 60 * 60 * 1000).toISOString(),
+            status: 'pending',
+            hasPassword: true,
+            details: {
+              userName: 'Vikram Singh',
+              mobile: '99887 76655',
+              email: 'vikram.singh@example.com',
+            },
+            files: {
+              aadharFront: demoFile('aadhar-front.svg', aadhar, 143360),
+              aadharBack: demoFile('aadhar-back.svg', aadharBack, 139264),
+              paymentImage: demoFile('payment-receipt.svg', payment, 184320),
+            },
+          },
+          {
+            id: 'DEMO-1004',
+            type: 'KYC',
+            title: 'KYC Complain',
+            createdAt: new Date(now - 3 * 24 * 60 * 60 * 1000).toISOString(),
+            status: 'pending',
+            hasPassword: true,
+            details: {
+              userName: 'Neha Verma',
+              mobile: '90909 09090',
+              email: 'neha.verma@example.com',
+            },
+            files: {
+              aadharFront: demoFile('aadhar-front.svg', aadhar, 143360),
+              aadharBack: demoFile('aadhar-back.svg', aadharBack, 139264),
+            },
+          },
+        ];
+      }
+
+      const DEMO_ROWS = buildDemoRows();
+
+      const list = document.getElementById('list');
+      const totalCount = document.getElementById('totalCount');
+      const todayCount = document.getElementById('todayCount');
+      const resultCount = document.getElementById('resultCount');
+      const todayBtn = document.getElementById('todayBtn');
+      const allBtn = document.getElementById('allBtn');
+      const demoNotice = document.getElementById('demoNotice');
+
+      const viewer = document.getElementById('viewer');
+      const viewerTitle = document.getElementById('viewerTitle');
+      const viewerMeta = document.getElementById('viewerMeta');
+      const viewerImg = document.getElementById('viewerImg');
+      const viewerFallback = document.getElementById('viewerFallback');
+      const viewerClose = document.getElementById('viewerClose');
+      const closeBtn = document.getElementById('closeBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+
+      let filter = 'all';
+      let rows = [];
+      let showingDemo = false;
+
+      function escapeHtml(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, (ch) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+        })[ch]);
+      }
+
+      function labelFor(key) {
+        if (LABELS[key]) return LABELS[key];
+        return String(key || '')
+          .replace(/([A-Z])/g, ' $1')
+          .replace(/^./, (ch) => ch.toUpperCase());
+      }
+
+      function formatDate(iso) {
+        const date = new Date(iso);
+        if (Number.isNaN(date.getTime())) return iso || '—';
+        return date.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+      }
+
+      function isToday(iso) {
+        const date = new Date(iso);
+        if (Number.isNaN(date.getTime())) return false;
+        const now = new Date();
+        return (
+          date.getFullYear() === now.getFullYear() &&
+          date.getMonth() === now.getMonth() &&
+          date.getDate() === now.getDate()
+        );
+      }
+
+      function formatSize(bytes) {
+        const size = Number(bytes) || 0;
+        if (size <= 0) return '';
+        if (size < 1024) return `${size} B`;
+        if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+        return `${(size / 1024 / 1024).toFixed(2)} MB`;
+      }
+
+      function isImage(file) {
+        if (!file) return false;
+        if ((file.type || '').startsWith('image/')) return true;
+        if ((file.data || '').startsWith('data:image/')) return true;
+        return /\.(png|jpe?g|gif|webp|bmp|heic|heif)(\?|$)/i.test(file.url || file.name || '');
+      }
+
+      function fileSrc(file) {
+        if (!file) return '';
+        return file.url || file.data || '';
+      }
+
+      function normalizeFiles(files) {
+        const out = {};
+        if (!files || typeof files !== 'object') return out;
+        Object.entries(files).forEach(([key, file]) => {
+          if (!file || typeof file !== 'object') return;
+          out[key] = {
+            name: file.name || key,
+            type: file.type || '',
+            size: Number(file.size) || 0,
+            url: file.url || '',
+            data: typeof file.data === 'string' ? file.data : '',
+          };
+        });
+        return out;
+      }
+
+      function normalizeRow(row) {
+        if (!row || typeof row !== 'object') return null;
+
+        const id = String(row.id || row.createdAt || '');
+        const type = String(row.type || '');
+        const title = String(row.title || (type ? `${type} Complain` : 'Complain'));
+        const createdAt = row.createdAt || row.created_at || new Date().toISOString();
+        const status = String(row.status || 'pending');
+
+        let details = {};
+        if (row.details && typeof row.details === 'object') {
+          details = { ...row.details };
+        } else {
+          details = {
+            userName: row.userName || row.user_name || '',
+            mobile: row.mobile || '',
+            email: row.email || '',
+          };
+          if (row.amount) details.amount = row.amount;
+          if (row.message) details.message = row.message;
+          if (row.extra && typeof row.extra === 'object') details = { ...details, ...row.extra };
+        }
+
+        const hasPassword = Boolean(row.hasPassword) || Boolean(details.password);
+        delete details.password;
+
+        return {
+          id,
+          type,
+          title,
+          createdAt,
+          status,
+          details,
+          hasPassword,
+          files: normalizeFiles(row.files),
+        };
+      }
+
+      function getRows() {
+        try {
+          const raw = localStorage.getItem(KEY);
+          const data = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(data)) return [];
+          return data
+            .map(normalizeRow)
+            .filter(Boolean)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        } catch {
+          return [];
+        }
+      }
+
+      function detailKeys(details) {
+        const keys = Object.keys(details || {});
+        return [
+          ...PREFERRED_KEYS.filter((key) => keys.includes(key)),
+          ...keys.filter((key) => !PREFERRED_KEYS.includes(key)),
+        ];
+      }
+
+      function detailsHtml(details) {
+        const keys = detailKeys(details);
+        if (!keys.length) {
+          return `
+            <div class="detail">
+              <span class="detail-label">Details</span>
+              <span class="detail-value">—</span>
+            </div>`;
+        }
+
+        return keys.map((key) => {
+          const value = details[key];
+          const shown = value === undefined || value === null || String(value).trim() === '' ? '—' : value;
+          return `
+            <div class="detail">
+              <span class="detail-label">${escapeHtml(labelFor(key))}</span>
+              <span class="detail-value">${escapeHtml(shown)}</span>
+            </div>`;
+        }).join('');
+      }
+
+      function fileIconSvg(image) {
+        if (image) {
+          return `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <path d="M21 15l-5-5L5 21"></path>
+            </svg>`;
+        }
+        return `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="8" y1="13" x2="16" y2="13"></line>
+            <line x1="8" y1="17" x2="14" y2="17"></line>
+          </svg>`;
+      }
+
+      function filesHtml(row) {
+        const entries = Object.entries(row.files || {});
+        if (!entries.length) {
+          return `
+            <div class="attachments">
+              <h3>Attachments</h3>
+              <div class="no-files">No attachments uploaded.</div>
+            </div>`;
+        }
+
+        return `
+          <div class="attachments">
+            <h3>Attachments <span class="attachment-count">${entries.length}</span></h3>
+            <div class="file-list">
+              ${entries.map(([key, file]) => {
+                const image = isImage(file);
+                const size = formatSize(file.size);
+                return `
+                  <div class="file-row">
+                    <div class="file-icon">${fileIconSvg(image)}</div>
+                    <div class="file-meta">
+                      <strong>${escapeHtml(labelFor(key))}</strong>
+                      <span>${escapeHtml(file.name || 'Attachment')}${size ? ` • ${escapeHtml(size)}` : ''}</span>
+                    </div>
+                    <button
+                      class="btn view-btn"
+                      type="button"
+                      data-id="${escapeHtml(row.id)}"
+                      data-key="${escapeHtml(key)}"
+                    >View</button>
+                  </div>`;
+              }).join('')}
+            </div>
+          </div>`;
+      }
+
+      function statusClass(status) {
+        const value = String(status || '').toLowerCase();
+        return ['pending', 'success', 'danger', 'warning', 'info'].includes(value) ? value : 'pending';
+      }
+
+      function statusLabel(status) {
+        const value = String(status || 'pending');
+        return value.charAt(0).toUpperCase() + value.slice(1);
+      }
+
+      function cardHtml(row) {
+        const type = row.type || 'Complaint';
+        const initial = type.trim().charAt(0).toUpperCase() || 'C';
+        return `
+          <article class="complaint" data-id="${escapeHtml(row.id)}">
+            <div class="complaint-top">
+              <div class="complaint-head">
+                <div class="type-icon" aria-hidden="true">${escapeHtml(initial)}</div>
+                <div>
+                  <h2 class="complaint-title">${escapeHtml(row.title || `${type} Complain`)}</h2>
+                  <p class="complaint-meta">
+                    #${escapeHtml(row.id)}
+                    <span class="meta-sep">•</span>
+                    ${escapeHtml(formatDate(row.createdAt))}
+                  </p>
+                </div>
+              </div>
+              <span class="status ${statusClass(row.status)}">${escapeHtml(statusLabel(row.status))}</span>
+            </div>
+
+            <div class="detail-grid">${detailsHtml(row.details)}</div>
+            ${filesHtml(row)}
+
+            <div class="complaint-foot">
+              <span>Complaint ID: ${escapeHtml(row.id)}</span>
+              <span class="password-tag ${row.hasPassword ? 'on' : ''}">
+                ${row.hasPassword ? 'Password set' : 'No password'}
+              </span>
+            </div>
+          </article>`;
+      }
+
+      function emptyHtml() {
+        return `
+          <div class="empty">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path>
+                <line x1="8" y1="9" x2="16" y2="9"></line>
+                <line x1="8" y1="13" x2="13" y2="13"></line>
+              </svg>
+            </div>
+            <h2>${filter === 'today' ? 'No complaints today' : 'No complaints yet'}</h2>
+            <p>${filter === 'today'
+              ? 'Complaints submitted today will appear here.'
+              : 'New complaints submitted from the support pages will appear here.'}</p>
+          </div>`;
+      }
+
+      function setFilter(next) {
+        filter = next;
+        render();
+      }
+
+      function render() {
+        const realRows = getRows();
+        showingDemo = realRows.length === 0;
+        rows = showingDemo ? DEMO_ROWS : realRows;
+
+        const todayRows = rows.filter((row) => isToday(row.createdAt));
+        const visible = filter === 'today' ? todayRows : rows;
+
+        demoNotice.hidden = !showingDemo;
+        totalCount.textContent = String(rows.length);
+        todayCount.textContent = String(todayRows.length);
+        resultCount.textContent = String(visible.length);
+
+        todayBtn.classList.toggle('active', filter === 'today');
+        allBtn.classList.toggle('active', filter === 'all');
+        todayBtn.setAttribute('aria-pressed', String(filter === 'today'));
+        allBtn.setAttribute('aria-pressed', String(filter === 'all'));
+
+        list.innerHTML = visible.length ? visible.map(cardHtml).join('') : emptyHtml();
+      }
+
+      function openViewer(row, key) {
+        const file = row.files[key];
+        if (!file) return;
+
+        const src = fileSrc(file);
+        const image = isImage(file);
+        const title = labelFor(key);
+        const size = formatSize(file.size);
+
+        viewerTitle.textContent = title;
+        viewerMeta.textContent = [file.name || 'Attachment', size].filter(Boolean).join(' • ');
+
+        viewerImg.onerror = () => {
+          viewerImg.hidden = true;
+          viewerFallback.hidden = false;
+        };
+
+        if (image && src) {
+          viewerImg.hidden = false;
+          viewerImg.src = src;
+          viewerImg.alt = file.name || title;
+          viewerFallback.hidden = true;
+        } else {
+          viewerImg.hidden = true;
+          viewerImg.removeAttribute('src');
+          viewerFallback.hidden = false;
+        }
+
+        if (src) {
+          downloadBtn.href = src;
+          downloadBtn.download = file.name || 'attachment';
+          downloadBtn.classList.remove('disabled');
+          downloadBtn.removeAttribute('aria-disabled');
+        } else {
+          downloadBtn.removeAttribute('href');
+          downloadBtn.classList.add('disabled');
+          downloadBtn.setAttribute('aria-disabled', 'true');
+        }
+
+        viewer.hidden = false;
+        document.body.classList.add('viewer-open');
+        requestAnimationFrame(() => viewer.classList.add('open'));
+        viewerClose.focus();
+      }
+
+      function closeViewer() {
+        viewer.classList.remove('open');
+        viewer.hidden = true;
+        viewerImg.removeAttribute('src');
+        viewerImg.hidden = false;
+        viewerFallback.hidden = true;
+        document.body.classList.remove('viewer-open');
+      }
+
+      list.addEventListener('click', (event) => {
+        const button = event.target.closest('.view-btn');
+        if (!button) return;
+        const id = button.getAttribute('data-id');
+        const key = button.getAttribute('data-key');
+        const row = rows.find((item) => item.id === id);
+        if (row) openViewer(row, key);
+      });
+
+      todayBtn.addEventListener('click', () => setFilter('today'));
+      allBtn.addEventListener('click', () => setFilter('all'));
+
+      viewerClose.addEventListener('click', closeViewer);
+      closeBtn.addEventListener('click', closeViewer);
+      viewer.addEventListener('click', (event) => {
+        if (event.target === viewer) closeViewer();
+      });
+
+      downloadBtn.addEventListener('click', (event) => {
+        if (!downloadBtn.getAttribute('href')) event.preventDefault();
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !viewer.hidden) closeViewer();
+      });
+
+      window.addEventListener('storage', (event) => {
+        if (!event.key || event.key === KEY) render();
+      });
+
+      window.addEventListener('complains-updated', render);
+
+      render();
+    })();
+  </script>
+</body>
+</html>
