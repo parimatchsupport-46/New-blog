@@ -10,6 +10,7 @@ export default function UnlockWithdrawalComplain() {
     { key: 'issueImage', label: 'Upload Issue Image' },
     { key: 'aadharFront', label: 'Upload Aadhar Card Front' },
     { key: 'aadharBack', label: 'Upload Aadhar Card Back' },
+    { key: 'selfieWithId', label: 'Selfie Image with Pan/Aadhar Card' }
   ]}
       requiredFilesMessage="Please upload all required images"
     />

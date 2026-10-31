@@ -6,12 +6,8 @@ export default function BonusComplain() {
     <ComplainForm
       type="Bonus"
       title="Bonus Complain"
-  files={[
-    { key: 'aadharFront', label: 'Upload Aadhar Card Front' },
-    { key: 'aadharBack', label: 'Upload Aadhar Card Back' },
-    { key: 'paymentImage', label: 'Upload Payment Image' },
-  ]}
-      requiredFilesMessage="Please upload all required images"
+  files={[{ key: 'issueImage', label: 'Upload Issue Image' }]}
+      requiredFilesMessage="Please upload Issue Image"
     />
   )
 }

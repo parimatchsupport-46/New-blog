@@ -9,8 +9,9 @@ export default function KycComplain() {
   files={[
     { key: 'aadharFront', label: 'Upload Aadhar / Pan Card Front' },
     { key: 'aadharBack', label: 'Upload Aadhar / Pan Card Back' },
+    { key: 'selfieWithId', label: 'Selfie with Pan / Aadhar Card' }
   ]}
-      requiredFilesMessage="Please upload both front/back images"
+      requiredFilesMessage="Please upload all required images"
     />
   )
 }
