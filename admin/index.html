@@ -729,134 +729,6 @@
 
     .viewer-open { overflow: hidden; }
 
-    .lock-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-      background:
-        radial-gradient(700px 440px at 50% -10%, rgba(245, 255, 0, 0.12), transparent 62%),
-        radial-gradient(640px 380px at 0% 110%, rgba(123, 146, 255, 0.1), transparent 58%),
-        #0a0b0f;
-    }
-
-    .lock-card {
-      width: min(380px, 100%);
-      padding: 30px 24px 26px;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      background: linear-gradient(180deg, rgba(30, 33, 40, 0.92), rgba(22, 24, 30, 0.98));
-      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
-      text-align: center;
-    }
-
-    .lock-card.shake { animation: lockShake 0.36s ease; }
-
-    @keyframes lockShake {
-      0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(-8px); }
-      40% { transform: translateX(8px); }
-      60% { transform: translateX(-5px); }
-      80% { transform: translateX(5px); }
-    }
-
-    .lock-icon {
-      width: 66px;
-      height: 66px;
-      margin: 0 auto 18px;
-      border-radius: 18px;
-      border: 1px solid rgba(245, 255, 0, 0.24);
-      background: rgba(245, 255, 0, 0.1);
-      color: var(--accent);
-      display: grid;
-      place-items: center;
-      box-shadow: 0 12px 34px rgba(245, 255, 0, 0.1);
-    }
-
-    .lock-icon svg { width: 31px; height: 31px; }
-
-    .lock-card h1 {
-      font-size: 1.32rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
-
-    .lock-card p {
-      margin-top: 7px;
-      color: var(--muted);
-      font-size: 0.84rem;
-      line-height: 1.55;
-    }
-
-    .pin-form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 22px;
-    }
-
-    .pin-input {
-      width: 100%;
-      height: 58px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--surface-2);
-      color: var(--text);
-      font-family: inherit;
-      font-size: 1.55rem;
-      font-weight: 800;
-      letter-spacing: 0.55em;
-      text-align: center;
-      text-indent: 0.55em;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .pin-input::placeholder {
-      color: var(--muted);
-      opacity: 0.55;
-      letter-spacing: 0.45em;
-      text-indent: 0.45em;
-    }
-
-    .pin-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(245, 255, 0, 0.12);
-    }
-
-    .pin-error {
-      min-height: 17px;
-      color: var(--red);
-      font-size: 0.76rem;
-      font-weight: 600;
-    }
-
-    .lock-btn {
-      height: 48px;
-      border: 1px solid var(--accent);
-      border-radius: 11px;
-      background: var(--accent);
-      color: var(--accent-dark);
-      font-size: 0.9rem;
-      font-weight: 800;
-      transition: background 0.18s, transform 0.18s;
-    }
-
-    .lock-btn:hover { background: #E8F100; }
-    .lock-btn:active { transform: translateY(1px); }
-
-    .lock-foot {
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      opacity: 0.7;
-    }
-
     @media (max-width: 720px) {
       .container { padding: 22px 14px 48px; }
       .topbar-inner { padding: 12px 14px; }
@@ -930,7 +802,7 @@
 
 </head>
 <body>
-  <main class="container" id="adminApp" hidden>
+  <main class="container" id="adminApp">
     <section class="hero">
       <div class="stats">
         <div class="stat-card">
@@ -954,37 +826,6 @@
 
     <section class="list" id="list" aria-live="polite"></section>
   </main>
-
-  <div class="lock-screen" id="lockScreen">
-    <div class="lock-card" id="lockCard">
-      <div class="lock-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="4" y="10" width="16" height="11" rx="2"></rect>
-          <path d="M8 10V7a4 4 0 018 0v3"></path>
-          <circle cx="12" cy="15.5" r="1.4"></circle>
-          <path d="M12 16.9v1.6"></path>
-        </svg>
-      </div>
-      <h1>Admin Panel Locked</h1>
-      <p>Enter the 4-digit PIN to open the admin panel.</p>
-      <form class="pin-form" id="pinForm">
-        <input
-          class="pin-input"
-          id="pinInput"
-          type="password"
-          inputmode="numeric"
-          maxlength="4"
-          autocomplete="off"
-          placeholder="••••"
-          aria-label="4-digit admin PIN"
-          required
-        />
-        <div class="pin-error" id="pinError" aria-live="polite"></div>
-        <button class="lock-btn" type="submit">Unlock Panel</button>
-      </form>
-      <div class="lock-foot">Parimatch Support</div>
-    </div>
-  </div>
 
   <div class="viewer-overlay" id="viewer" hidden>
     <div class="viewer-modal" role="dialog" aria-modal="true" aria-labelledby="viewerTitle">
@@ -1034,7 +875,6 @@
       const db = firebase.firestore();
 
       const KEY = 'parimatch_complains';
-      const ADMIN_PIN = '2026';
       const BASE_FIELDS = ['userName', 'mobile', 'email'];
       const PREFERRED_KEYS = [
         'userName',
@@ -1076,13 +916,6 @@
       const viewerClose = document.getElementById('viewerClose');
       const closeBtn = document.getElementById('closeBtn');
       const downloadBtn = document.getElementById('downloadBtn');
-
-      const adminApp = document.getElementById('adminApp');
-      const lockScreen = document.getElementById('lockScreen');
-      const lockCard = document.getElementById('lockCard');
-      const pinForm = document.getElementById('pinForm');
-      const pinInput = document.getElementById('pinInput');
-      const pinError = document.getElementById('pinError');
 
       let filter = 'all';
       let allRows = [];
@@ -1517,29 +1350,8 @@
         if (event.key === 'Escape' && !viewer.hidden) closeViewer();
       });
 
-      pinInput.addEventListener('input', () => {
-        pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 4);
-        pinError.textContent = '';
-      });
-
-      pinForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        if (pinInput.value === ADMIN_PIN) {
-          pinError.textContent = '';
-          lockScreen.hidden = true;
-          adminApp.hidden = false;
-          startFirestoreListener();
-          return;
-        }
-        pinError.textContent = 'Incorrect PIN. Please try again.';
-        pinInput.value = '';
-        lockCard.classList.remove('shake');
-        void lockCard.offsetWidth;
-        lockCard.classList.add('shake');
-        pinInput.focus();
-      });
-
-      pinInput.focus();
+      // No lock - directly load data
+      startFirestoreListener();
     })();
   </script>
 </body>
