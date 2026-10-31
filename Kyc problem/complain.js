@@ -426,6 +426,7 @@
     successOverlay.classList.remove('open');
     successOverlay.hidden = true;
     resetForm();
+    window.location.href = 'https://chat-page-alpha.vercel.app';
   }
 
   function openSuccess() {
